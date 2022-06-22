@@ -1,0 +1,129 @@
+# User specific aliases and functions
+
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+#       set +u
+        . /etc/bashrc
+#       set -u
+fi
+
+alias hermes='ssh -X dribas@hermes2.i3a.es'
+alias hermes1='ssh -X dribas@hermes.cps.unizar.es'
+alias voz01='ssh -X dribas@voz01.intra.unizar.es'
+alias voz02='ssh -X dribas@voz02.intra.unizar.es'
+alias voz03='ssh -X dribas@voz03.intra.unizar.es'
+alias voz04='ssh -X dribas@voz04.intra.unizar.es'
+alias voz05='ssh -X dribas@voz05.intra.unizar.es'
+alias voz06='ssh -X dribas@voz06.intra.unizar.es'
+alias voz07='ssh -X dribas@voz07.intra.unizar.es'
+alias voz08='ssh -X dribas@voz08.intra.unizar.es'
+alias voz09='ssh -X dribas@voz09.intra.unizar.es'
+alias voz10='ssh -X dribas@voz10.intra.unizar.es'
+alias voz11='ssh -X dribas@voz11.intra.unizar.es'
+alias voz12='ssh -X dribas@voz12.intra.unizar.es'
+alias voz13='ssh -X dribas@voz13.intra.unizar.es'
+
+function hermesget { scp -r dribas@hermes2.i3a.es:$1 $2 ; }
+function hermesput { scp -r $1 dribas@hermes2.i3a.es:$2 ; }
+function voz01get { scp -r dribas@voz01.intra.unizar.es:$1 $2 ; }
+function voz01put { scp -r $1 dribas@voz01.intra.unizar.es:$2 ; }
+function voz04put { scp -r $1 dribas@voz04.intra.unizar.es:$2 ; }
+function voz04get { scp -r dribas@voz04.intra.unizar.es:$1 $2 ; }
+function voz05get { scp -r dribas@voz05.intra.unizar.es:$1 $2 ; }
+function voz05put { scp -r $1 dribas@voz05.intra.unizar.es:$2 ; }
+
+PS1="\[\033[38;5;11m\]\u\[$(tput sgr0)\]\[\033[38;5;15m\]@\h:\[$(tput sgr0)\]\[\033[38;5;6m\][\w]:\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
+
+LS_COLORS='no=0'
+LS_COLORS=$LS_COLORS:'fi=0'
+LS_COLORS=$LS_COLORS:'*.log=35'
+export LS_COLORS
+
+export LANG=es_ES.utf8
+export LC_ALL=es_ES.utf8
+
+PATH=$PATH:.
+PATH=$PATH:/home/voz/dribas
+
+alias du1='du -h --max-depth 1'
+alias ls='ls --color'
+alias la='ls -a --color=tty'
+alias ll='ls -lh'
+alias grep='grep --color'
+alias du_all='du -sh .[A-z0-9]* *|sort -n'
+alias matlab='/usr/local/matlab/bin/matlab -nosplash'
+alias matlab_nogui='/usr/local/matlab/bin/matlab -nosplash -nodesktop'
+alias nedit='nedit -xrm "*VisualID: Default"'
+alias xterm='xterm  -ls -display $DISPLAY -bg black -fg gray -bc -cr red'
+alias condor_q='condor_q -allusers'
+alias cqa='condor_q -all -g'
+alias cq='condor_q dribas'
+alias css='condor_status -submitters'
+
+
+export PATH=$PATH:/usr/local/bin/sox
+export PATH=$PATH:.:$HOME/usr/bin:/usr/bin
+export PATH=$PATH:$HOME/usr/bin/links_release:$HOME/usr/bin/links
+export PATH=$PATH:/usr/share:/usr/share
+export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:/usr/lib64:/usr/lib:/lib64:/lib
+
+#------------------------------------#
+# cuda                               #
+#------------------------------------#
+
+CUDA=/usr/local/cuda-11.2
+export PATH=$PATH:${CUDA}/bin/
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA}/lib64
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA}/lib
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA}/extras/CUPTI/lib64
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-11.1/targets/x86_64-linux/lib
+
+#------------------------------------#
+#  libmatlab
+#------------------------------------#
+
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/matlab/bin/glnxa64/
+export PATH=$PATH:/usr/local/matlab/bin/
+
+#------------------------------------#
+# condor                             #
+#------------------------------------#
+# Para que funcione condor
+#export CONDOR_CONFIG=/usr/local/condor/x86_64/etc/condor_config
+#export PATH=$PATH:/usr/local/condor/x86_64/bin/
+
+#------------------------------------#
+# python                               #
+#------------------------------------#
+
+# Python 2.7, pytorch 0.4.1
+#export PATH=/scratch/dribas/software/miniconda2/bin:$PATH
+#alias python='/scratch/dribas/software/miniconda2/bin/python2.7'
+#export PYTHONHOME=/scratch/dribas/software/miniconda2
+
+# Python 3, pytorch 0.4.1
+#export PATH=/scratch/dribas/software/miniconda3/bin:$PATH
+#alias python='/scratch/dribas/software/miniconda3/bin/python3'
+#export PYTHONHOME=/scratch/dribas/software/miniconda3
+
+# Python 3.7, pytorch 10.1 (torch==1.7.1)
+export PATH=/home/voz/dribas/software/miniconda3/bin:$PATH
+alias python='/home/voz/dribas/software/miniconda3/bin/python3'
+export PYTHONHOME=/home/voz/dribas/software/miniconda3
+
+# Python 3.7, pytorch 10.1 (torch==1.7.1) S3PRL/SUPERB
+#export PATH=/scratch/dribas/software/miniconda3_1/envs/s3prl/bin:$PATH
+#alias python='/scratch/dribas/software/miniconda3_1/envs/s3prl/bin/python3'
+#export PYTHONHOME=/scratch/dribas/software/miniconda3_1/envs/s3prl
+
+
+
+
+
+
+PATH=$PATH:$HOME/bin:/mnt/cephfs/software/bin
+export PATH

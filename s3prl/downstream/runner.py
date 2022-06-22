@@ -289,6 +289,7 @@ class Runner():
                     else:
                         with torch.no_grad():
                             features = self.upstream.model(wavs)
+                    
                     features = self.featurizer.model(wavs, features)
 
                     if specaug:

@@ -1,0 +1,12 @@
+__pycache__
+.condor
+.vscode
+*.pyc
+*.err
+*.clog
+*.sub
+launch.json
+downstream/pathologies/data/audio
+expert_copy.py
+log
+result
