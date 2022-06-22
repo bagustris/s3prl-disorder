@@ -6,6 +6,7 @@ __pycache__
 *.err
 *.clog
 *.sub
+condor.cfg
 launch.json
 expert_copy.py
 log
