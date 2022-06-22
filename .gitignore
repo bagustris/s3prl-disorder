@@ -1,3 +1,20 @@
+#S3prl folder
+__pycache__
+.condor
+.vscode
+*.pyc
+*.err
+*.clog
+*.sub
+launch.json
+expert_copy.py
+log
+s3prl/downstream/voicedisorder/data/audio
+s3prl/result
+s3prl/run_voicedisorder_finetune.sh
+s3prl/run_voicedisorder_basic.sh
+s3prl/condor_run_voicedisorder.sh
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
