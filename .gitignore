@@ -11,6 +11,7 @@ launch.json
 expert_copy.py
 log
 s3prl/downstream/voicedisorder/data/audio
+s3prl/downstream/voicedisorder/*.py
 s3prl/result
 s3prl/run_voicedisorder_finetune.sh
 s3prl/run_voicedisorder_basic.sh
