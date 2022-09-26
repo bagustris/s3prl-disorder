@@ -1,7 +1,5 @@
 <p align="center">
-    <img src="./file/S3PRL-logo.png" width="700"/>
-    <br>
-    <img src="./file/S3PRL-disorder.png" width="700"/>
+    <img src="./file/disorder.png" width="700"/>
     <br>
 </p>
 
