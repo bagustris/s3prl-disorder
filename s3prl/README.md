@@ -1,6 +1,6 @@
 # Voice Disorder Detection Downstream 
 
-In this branch there is a downstream for Automatic Voice Disorder Detection (AVDD) based on S3PRL toolkit.As frontend you can use any Self-Supervised representation from S3PRL including Wavlm, HuBERT, Wav2Vec, etc (see more upstreams at https://github.com/s3prl/s3prl). As backend there are several models available for classification including: 
+In this branch there is a downstream for Automatic Voice Disorder Detection (AVDD) based on S3PRL toolkit. As frontend you can use any Self-Supervised representation from S3PRL including Wavlm, HuBERT, Wav2Vec, etc (see more upstreams at https://github.com/s3prl/s3prl). As backend there are several models available for classification including: 
 * *MLP:* Basic pooling + linear layer
 * *CNNSelfAttention:* Convolutional Neural Network with Self Attention mechanism
 * *Transformer:* 2-layer ViT-Transformer
@@ -8,33 +8,57 @@ In this branch there is a downstream for Automatic Voice Disorder Detection (AVD
 ## Databases 
 
 So far the databases included in this downstream are the following (both are free available):
-* *SVD* Saarbruecken Voice Database (http://www.stimmdatenbank.coli.uni-saarland.de/help_en.php4)
-* *AVFAD* Advanced Voice Function Assessment Database (http://acsa.web.ua.pt/AVFAD.htm)
+* **SVD** Saarbruecken Voice Database 
+(http://www.stimmdatenbank.coli.uni-saarland.de/help_en.php4)
+* **AVFAD** Advanced Voice Function Assessment Database 
+(http://acsa.web.ua.pt/AVFAD.htm)
 
 ## Usage
-For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated.
+For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated at https://github.com/s3prl/s3prl).
 
-# Installation
+### Installation
 1. Clone repo
-```git clone https://github.com/dayanavivolab/s3prl.git ```
 
-2. Create environment and activate: **Python** >= 3.6
-``` python -m venv /scratch/user/miniconda3/envs/s3prl``` 
-```source /scratch/user/miniconda3/envs/s3prl/bin/activate```
+```
+git clone https://github.com/dayanavivolab/s3prl.git 
+```
 
-3. Install **sox** on your OS
+2. Create environment and activate (Python >= 3.6)
+
+``` 
+python -m venv /scratch/user/miniconda3/envs/s3prl
+``` 
+
+```
+source /scratch/user/miniconda3/envs/s3prl/bin/activate
+```
+
+3. Install **sox** 
 4. Install **s3prl**
-```python -m pip install -e ./```
+
+```
+python -m pip install -e ./
+```
 
 5. Install **fairseq**
-```git clone https://github.com/pytorch/fairseq```
-```cd fairseq```
-```python -m pip install --editable ./```
+
+```
+git clone https://github.com/pytorch/fairseq
+```
+
+```
+cd fairseq
+```
+
+```
+python -m pip install --editable ./
+```
 
 6. Install **torch** (if you already have your own torch skip this step)
+
 ```pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html```
 
-# Run experiment
+### Run experiment
 For running experiments you can use:   
 ```
 sh run_voicedisorder.sh 
@@ -45,10 +69,10 @@ Please configurate the script accordingly by choosing:
 * Frontend: wavlm, hubert, wav2vec, fft (see more upstreams at https://github.com/s3prl/s3prl)
 * Backend: Transformer, CNNSelfAtt, MLP
 
-# Results
+### Results
 Experimental results are located in s3prl/result/downstream/yourfoldername.
 
-Also you can get the system performance metrics by using: 
+Also you can get several system performance metrics by using: 
 ```
 python compute_metrics_full.py s3prl/result/downstream yourdirname 5
 ```
