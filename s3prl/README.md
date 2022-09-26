@@ -1,7 +1,7 @@
 <p align="center">
-    <img src="./s3prl/downstream/voicedisorder/S3PRL-logo.png" width="700"/>
+    <img src="./file/S3PRL-logo.png" width="700"/>
     <br>
-    <img src="./s3prl/downstream/voicedisorder/System_peque.png" width="700"/>
+    <img src="./file/System_peque.png" width="700"/>
     <br>
 </p>
 
