@@ -13,8 +13,8 @@ log
 s3prl/downstream/voicedisorder/data/audio
 s3prl/downstream/voicedisorder/*.py
 s3prl/result
-s3prl/run_voicedisorder_finetune.sh
-s3prl/run_voicedisorder_basic.sh
+#s3prl/run_voicedisorder_finetune.sh
+#s3prl/run_voicedisorder_basic.sh
 s3prl/condor_run_voicedisorder.sh
 
 # Byte-compiled / optimized / DLL files
@@ -163,7 +163,7 @@ data
 # experiment files
 *.png
 *.pkl
-*.yaml
+#*.yaml
 *.sh
 *.pt
 *.tar

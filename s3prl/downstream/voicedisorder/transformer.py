@@ -101,7 +101,6 @@ class Transformer(nn.Module):
         x = self.block(x)  
         tokenclass = x[:,0]
         predicted = self.out(tokenclass)
-        
         return predicted, tokenclass      
         
    

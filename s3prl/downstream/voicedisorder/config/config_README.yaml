@@ -1,0 +1,62 @@
+
+# README for config file
+
+runner:
+  total_steps: 30000
+  gradient_clipping: 1
+  gradient_accumulate_steps: 8
+
+  log_step: 500
+  eval_step: 100
+  save_step: 100
+  max_keep: 1
+  eval_dataloaders:
+    - dev
+    - test
+
+optimizer:
+  name: TorchOptim
+  torch_optim_name: Adam
+  lr: 1.0e-4            # lr: '1.0e-4', '1.0e-5' for finetune
+
+downstream_expert:
+  listrc:
+    audiotype: phrase   # audiotype='phrase','aiu','a_n': denpend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
+    gender: both        # gender='both','male','female': depend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
+    oracle: 0           # oracle='0', '1': Testing with the same train partition
+    augment: 0          # augment='0', '1': Use data/lst/train_'audiotype'_'gender'_augment_meta_data_fold*.json
+    augment_list: trainAVFAD-SVD  # augment_list: 'NONE' Use data/lst/train_'audiotype'_'gender'_meta_data_fold*.json
+                                  #               'LABEL': Use data/lst/train_'audiotype'_'gender'_LABEL_meta_data_fold*.json
+    augment_type: NONE # augment_type='NONE','mixup','batch'
+    mixup_alpha: 0.1    # mixup_alpha= numerical value 0-1
+    batch_augment_n: 1  # batch_augment_n= numerical value 1,2,3,etc: number of times batch is augmented, one time=1, two times=2, ten times = 10
+    
+  datarc:
+    root: downstream/voicedisorder/
+    test_fold: fold1
+    pre_load: True
+    train_batch_size: 4 
+    eval_batch_size: 4
+    num_workers: 4
+    valid_ratio: 0.2
+  
+  visualrc:
+    roc: 1            # roc='0','1': compute roc curve at each eval_step
+    embeddings: 1     # embeddings: '0','1': write embeddings at each eval step
+  
+  modelrc:
+    projector_dim: 512
+    select: Transformer # Classifier selection: 'Transformer','DeepModel','UtteranceLevel'
+  
+  # Uncomment only if select=UtteranceLevel
+  #UtteranceLevel:
+  #    pooling: AttentivePooling    # options in downstream/model.py:'MeanPooling','AttentivePooling' 
+
+  # Uncomment only if select=DeepModel
+  #DeepModel:
+  #    model_type: CNNSelfAttention   # options in downstream/pathologies/model.py: 'CNNSelfAttention','FCN'
+  #    hidden_dim: 80
+  #    kernel_size: 5
+  #    padding: 2
+  #    pooling: 5
+  #    dropout: 0.4  

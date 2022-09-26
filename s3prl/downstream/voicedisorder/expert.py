@@ -265,9 +265,15 @@ class DownstreamExpert(nn.Module):
         records['score_1'] += score[:,1].view(-1).cpu().float().tolist()
 
         # Write embeddings
-        if mode=='test' and features_pooled!=None and self.visualrc['embeddings']==1:
-            emb_path = self.expdir + '/embeddings'
-            if not os.path.exists(emb_path): os.mkdir(emb_path)
+        #if mode=='test' and features_pooled!=None and self.visualrc['embeddings']==1:
+        values = records['acc']
+        average = torch.FloatTensor(values).mean().item()
+        best = 0
+        if average > self.best_score: best=1
+        
+        if best==1 and features_pooled!=None and self.visualrc['embeddings']==1:
+            emb_path = self.expdir + '/embeddings/' + mode
+            if not os.path.exists(emb_path): os.makedirs(emb_path)
             for i in range(0,len(filenames)):
                 with open(emb_path+'/'+filenames[i]+'.pkl','wb') as fid:
                     data = []
@@ -275,7 +281,6 @@ class DownstreamExpert(nn.Module):
                     data.append(features[i].cpu().detach().numpy())
                     data.append(features_pooled[i].cpu().detach().numpy())
                     pickle.dump(data, fid, protocol=pickle.HIGHEST_PROTOCOL)
-            
         return loss
 
     # interface

@@ -1,0 +1,46 @@
+runner:
+  total_steps: 30000
+  gradient_clipping: 1
+  gradient_accumulate_steps: 8
+
+  log_step: 500
+  eval_step: 100
+  save_step: 100
+  max_keep: 1
+  eval_dataloaders:
+    - dev
+    - test
+
+optimizer:
+  name: TorchOptim
+  torch_optim_name: Adam
+  lr: 1.0e-4
+
+downstream_expert:
+  listrc:
+    audiotype: phrase   # audiotype='phrase','aiu','a_n': denpend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
+    gender: both        # gender='both','male','female': depend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
+    oracle: 0           # oracle='0', '1': Testing with the same train partition
+    augment_list: trainAVFAD-SVD         
+    augment_type: NONE 
+    mixup_alpha: 0.1    
+    batch_augment_n: 1  
+
+  datarc:
+    root: downstream/voicedisorder/
+    test_fold: fold1
+    pre_load: True
+    train_batch_size: 4 
+    eval_batch_size: 4
+    num_workers: 4
+    valid_ratio: 0.2
+  
+  visualrc:
+    roc: 0            # roc='0','1': compute roc curve at each eval_step
+    embeddings: 0     # embeddings: '0','1': write embeddings at each eval step
+
+  modelrc:
+    projector_dim: 512
+    select: Transformer # Classifier selection: 'Transformer','DeepModel','UtteranceLevel'
+  
+  

@@ -54,7 +54,6 @@ class UtteranceLevel(nn.Module):
 
         pooled, features_len = self.pooling(hidden_state, features_len)
         logit, features_len = self.post_net(pooled, features_len)
-
         return logit, features_len
 
 

@@ -284,12 +284,22 @@ class Runner():
                     global_step = pbar.n + 1
 
                     wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]
+                    
                     if self.upstream.trainable:
                         features = self.upstream.model(wavs)
                     else:
                         with torch.no_grad():
                             features = self.upstream.model(wavs)
-                    
+                    '''
+                    # Modified: Added checkpoint
+                    if self.upstream.trainable:
+                        print('do Checkpoint')
+                        features = checkpoint(self.upstream.model, wavs)
+                    else:
+                        with torch.no_grad():
+                            print('do Checkpoint')
+                            features = checkpoint(self.upstream.model, wavs)
+                    '''
                     features = self.featurizer.model(wavs, features)
 
                     if specaug:
