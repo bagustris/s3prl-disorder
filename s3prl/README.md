@@ -6,7 +6,7 @@ In this branch there is a downstream for Automatic Voice Disorder Detection (AVD
 * *Transformer:* 2-layer ViT-Transformer
 
 <p align="center">
-    <img src="./file/S3PRL-Disorder.png" width="700"/>
+    <img src="./file/S3PRL-logo.png" width="700"/>
     <br>
     <br>
 </p>
