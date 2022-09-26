@@ -5,6 +5,10 @@ In this branch there is a downstream for Automatic Voice Disorder Detection (AVD
 * *CNNSelfAttention:* Convolutional Neural Network with Self Attention mechanism
 * *Transformer:* 2-layer ViT-Transformer
 
+<p align="center">
+    <img src="./s3prl/s3prl/downstream/voicedisorder/S3PRL-Disorder.png" width="700"/>
+</p>
+
 ## Databases 
 
 So far the databases included in this downstream are the following (both are free available):
@@ -56,18 +60,28 @@ python -m pip install --editable ./
 
 6. Install **torch** (if you already have your own torch skip this step)
 
-```pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html```
+```
+pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+```
 
 ### Run experiment
 For running experiments you can use:   
 ```
 sh run_voicedisorder.sh 
 ```
-Please configurate the script accordingly by choosing: 
+
+## Configuration
+But first, please configurate the script accordingly by choosing: 
 * Training type: finetune, basic
 * Audiotype: phrase, aiu, a_n
 * Frontend: wavlm, hubert, wav2vec, fft (see more upstreams at https://github.com/s3prl/s3prl)
 * Backend: Transformer, CNNSelfAtt, MLP
+
+Also, see the following table with a description of the config files at s3prl/downstream/voicedisorder/config.
+
+<p align="center">
+    <img src="./s3prl/s3prl/downstream/voicedisorder/S3PRL-Disorder-config.png" width="800"/>
+</p>
 
 ### Results
 Experimental results are located in s3prl/result/downstream/yourfoldername.
