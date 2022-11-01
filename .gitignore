@@ -11,6 +11,7 @@ launch.json
 expert_extendido.py
 expert_mixup.py
 log
+data/audio
 s3prl/downstream/voicedisorder/data/audio
 s3prl/downstream/voicedisorder/expert_extendido.py
 s3prl/downstream/voicedisorder/expert_mixup.py
@@ -156,7 +157,7 @@ log_*
 Raw
 CMU_MOSI.zip
 libri_alignment.zip
-data
+#data
 
 # checkpoints
 *.ckpt
