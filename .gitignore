@@ -8,14 +8,16 @@ __pycache__
 *.sub
 condor.cfg
 launch.json
-expert_copy.py
+expert_extendido.py
+expert_mixup.py
 log
 s3prl/downstream/voicedisorder/data/audio
-s3prl/downstream/voicedisorder/*.py
+s3prl/downstream/voicedisorder/expert_extendido.py
+s3prl/downstream/voicedisorder/expert_mixup.py
 s3prl/result
 #s3prl/run_voicedisorder_finetune.sh
 #s3prl/run_voicedisorder_basic.sh
-s3prl/condor_run_voicedisorder.sh
+#s3prl/condor_run_voicedisorder.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

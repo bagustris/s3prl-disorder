@@ -93,6 +93,31 @@ def compute_plots(path_file):
     pathfigure=os.path.dirname(path_file)+'/results_by_epoch.png'
     plt.savefig(pathfigure)
 
+def compute_plots_loss(path_file):
+    with open(path_file,'r') as fid:
+        lines=fid.readlines()
+    epoch, dev_loss, test_loss = [], [], []
+    
+    for line in lines:
+        a = line.split(' ')
+        if a[0] == 'dev': 
+            epoch.append(int(a[3][:-1]))
+            dev_loss.append(float(a[4][5:].split('\n')[0]))
+        elif a[0] == 'test': 
+            test_loss.append(float(a[4][5:].split('\n')[0]))
+    
+    plt.figure()
+    plt.plot(epoch,dev_loss,'b')
+    plt.plot(epoch[0:len(test_loss)],test_loss,'r')
+    plt.title('Loss')
+    plt.legend(('dev','test'))
+    plt.grid(True)
+    
+    manager = plt.get_current_fig_manager() #fullscreen
+    manager.full_screen_toggle()
+    pathfigure=os.path.dirname(path_file)+'/loss_by_epoch.png'
+    plt.savefig(pathfigure)
+
 # Data augmentation
 def mixup_data(x, y, alpha=0.1, use_cuda=False):
     '''Returns mixed inputs, pairs of target and lambda '''
@@ -320,7 +345,15 @@ class DownstreamExpert(nn.Module):
                         self.best_score = torch.ones(1) * average
                         f.write(f'New best on {mode} at step {global_step}: ACC={average}, UAR={uar_value}, AUC={auc_value}, EER={eer_value}\n')
                         save_names.append(f'{mode}-best.ckpt')
-            if mode == 'test': compute_plots(self.expdir+"/log_acc_auc.log")  
+            if mode == 'test': compute_plots(self.expdir+"/log_acc_auc.log") 
+
+            # Write log with Loss
+            with open(Path(self.expdir) / "log_loss.log", 'a') as f:
+                if key == 'loss':
+                    print(mode+' Loss='+str(average))
+                    f.write(f'{mode} at step {global_step}: {key}={average}\n')
+                    if mode == 'test': compute_plots_loss(self.expdir+"/log_loss.log")  
+            #------------------------------------------------------ 
             #------------------------------------------------------
 
         if mode in ["dev", "test"]:
