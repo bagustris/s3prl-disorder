@@ -18,6 +18,8 @@ So far the databases included in this downstream are the following (both are fre
 * **AVFAD** Advanced Voice Function Assessment Database 
 (http://acsa.web.ua.pt/AVFAD.htm)
 
+Note: If you have any question about how to use the datasets in this toolkit, you can send me a mail.
+
 ## Usage
 For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated at https://github.com/s3prl/s3prl).
 
@@ -91,6 +93,10 @@ Also you can get several system performance metrics by using:
 ```
 python compute_metrics_full.py s3prl/result/downstream yourdirname 5
 ```
+Or you can visualize the embeddings by using (remember save the embeddings setting embeddings '1' in the config file): 
+```
+python compute_umap_tsne.py result/downstream/yourdirname/embeddings
+```
 # 
 
 ## Citation
@@ -104,3 +110,6 @@ If you find this toolkit useful, please consider citing the following paper.
   booktitle={Proc. Iberspeech 2022}
 }
 ```
+
+## Contact
+email: dribas@unizar.es
