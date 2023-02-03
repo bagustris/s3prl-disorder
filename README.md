@@ -18,7 +18,9 @@ So far the databases included in this downstream are the following (both are fre
 * **AVFAD** Advanced Voice Function Assessment Database 
 (http://acsa.web.ua.pt/AVFAD.htm)
 
-Note: If you have any question about how to use the datasets in this toolkit, you can send me a mail.
+You need to locate the datasets in the following directories (see the audio path format in downstream/voicedisorder/data/lst/*.json): 
+- downstream/voicedisorder/data/audio/Saarbruecken
+- downstream/voicedisorder/data/audio/AVFAD
 
 ## Usage
 For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated at https://github.com/s3prl/s3prl).
