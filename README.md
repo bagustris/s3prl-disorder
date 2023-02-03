@@ -18,7 +18,9 @@ So far the databases included in this downstream are the following (both are fre
 * **AVFAD** Advanced Voice Function Assessment Database 
 (http://acsa.web.ua.pt/AVFAD.htm)
 
-Note: If you have any question about how to use the datasets in this toolkit, you can send me a mail.
+You need to locate the datasets in the following directories (see the audio path format in downstream/voicedisorder/data/lst/*.json): 
+- downstream/voicedisorder/data/audio/Saarbruecken
+- downstream/voicedisorder/data/audio/AVFAD
 
 ## Usage
 For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated at https://github.com/s3prl/s3prl).
@@ -30,13 +32,10 @@ For running an experiment you need to clone the repo and install S3PRL toolkit a
 git clone https://github.com/dayanavivolab/s3prl.git 
 ```
 
-2. Create environment and activate (Python >= 3.6)
+2. Create and activate environment (Python >= 3.6)
 
 ``` 
 python -m venv /scratch/user/miniconda3/envs/s3prl
-``` 
-
-```
 source /scratch/user/miniconda3/envs/s3prl/bin/activate
 ```
 
@@ -51,13 +50,7 @@ python -m pip install -e ./
 
 ```
 git clone https://github.com/pytorch/fairseq
-```
-
-```
 cd fairseq
-```
-
-```
 python -m pip install --editable ./
 ```
 
@@ -107,7 +100,9 @@ If you find this toolkit useful, please consider citing the following paper.
   author={Dayana Ribas and Miguel Angel Pastor and Antonio Miguel and David Martinez and Alfonso Ortega and Eduardo Lleida},
   title={{S3prl-Disorder: Open-Source Voice Disorder Detection System based in the Framework of S3PRL-toolkit.}},
   year=2022,
-  booktitle={Proc. Iberspeech 2022}
+  booktitle={Proc. Iberspeech 2022},
+  pages={136--140},
+  url={https://www.isca-speech.org/archive/pdfs/iberspeech_2022/ribas22_iberspeech.pdf}
 }
 ```
 
