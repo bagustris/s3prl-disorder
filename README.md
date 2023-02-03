@@ -1,14 +1,13 @@
 # Voice Disorder Detection Downstream 
-
-<p align="center">
-    <img src="./file/S3PRL-disorder.png" width="400"/>
-    <br>
-</p>
-
 In this branch there is a downstream for Automatic Voice Disorder Detection (AVDD) based on S3PRL toolkit. As frontend you can use any Self-Supervised representation from S3PRL including Wavlm, HuBERT, Wav2Vec, etc (see more upstreams at https://github.com/s3prl/s3prl). As backend there are several models available for classification including: 
 * *MLP:* Basic pooling + linear layer
 * *CNNSelfAttention:* Convolutional Neural Network with Self Attention mechanism
 * *Transformer:* 2-layer ViT-Transformer
+
+<p align="center">
+    <img src="./file/S3PRL-disorder.png" width="500"/>
+    <br>
+</p>
 
 ## Databases 
 
@@ -76,7 +75,7 @@ But first, please configurate the script accordingly by choosing:
 Also, see the following table with a description of the config files at s3prl/downstream/voicedisorder/config.
 
 <p align="center">
-    <img src="./file/S3PRL-disorder-config.png" width="400"/>
+    <img src="./file/S3PRL-disorder-config.png" width="550"/>
 </p>
 
 ### Results
