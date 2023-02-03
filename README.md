@@ -100,7 +100,9 @@ If you find this toolkit useful, please consider citing the following paper.
   author={Dayana Ribas and Miguel Angel Pastor and Antonio Miguel and David Martinez and Alfonso Ortega and Eduardo Lleida},
   title={{S3prl-Disorder: Open-Source Voice Disorder Detection System based in the Framework of S3PRL-toolkit.}},
   year=2022,
-  booktitle={Proc. Iberspeech 2022}
+  booktitle={Proc. Iberspeech 2022},
+  pages={136--140},
+  url={https://www.isca-speech.org/archive/pdfs/iberspeech_2022/ribas22_iberspeech.pdf}
 }
 ```
 
