@@ -30,13 +30,10 @@ For running an experiment you need to clone the repo and install S3PRL toolkit a
 git clone https://github.com/dayanavivolab/s3prl.git 
 ```
 
-2. Create environment and activate (Python >= 3.6)
+2. Create and activate environment (Python >= 3.6)
 
 ``` 
 python -m venv /scratch/user/miniconda3/envs/s3prl
-``` 
-
-```
 source /scratch/user/miniconda3/envs/s3prl/bin/activate
 ```
 
@@ -51,13 +48,7 @@ python -m pip install -e ./
 
 ```
 git clone https://github.com/pytorch/fairseq
-```
-
-```
 cd fairseq
-```
-
-```
 python -m pip install --editable ./
 ```
 
