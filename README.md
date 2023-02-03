@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./file/S3PRL-disorder.png" width="700"/>
+    <img src="./file/S3PRL-disorder.png" width="400"/>
     <br>
 </p>
 
@@ -76,7 +76,7 @@ But first, please configurate the script accordingly by choosing:
 Also, see the following table with a description of the config files at s3prl/downstream/voicedisorder/config.
 
 <p align="center">
-    <img src="./file/S3PRL-disorder-config.png" width="800"/>
+    <img src="./file/S3PRL-disorder-config.png" width="400"/>
 </p>
 
 ### Results
