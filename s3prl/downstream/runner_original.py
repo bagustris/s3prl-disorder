@@ -9,9 +9,6 @@ import tempfile
 import importlib
 from pathlib import Path
 
-from .mixup import mixup_wavs_samelabel
-from torch.nn.utils.rnn import pad_sequence
-
 import torch
 import torchaudio
 import numpy as np
@@ -251,39 +248,14 @@ class Runner():
                         break
                     global_step = pbar.n + 1
 
-                    wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]  
-                    #print('wavs: ',type(wavs),len(wavs),wavs[0].shape)
-                    #print(type(others[0]))
-                                        
-                    # Added by dayi: Mixup in wavs
-                    aug_type = self.config['downstream_expert']['listrc']['augment_type']
-                    print(aug_type)
-                    if aug_type=='mixup_wavs':
-                        alpha = self.config['downstream_expert']['listrc']['mixup_alpha']
-                        beta = self.config['downstream_expert']['listrc']['mixup_beta']
-                        labels = list(others[0])
-                        wavs = pad_sequence(wavs, batch_first=True)
-                        print(wavs.shape)
-                        wavs_mixed, labels_mixed  = mixup_wavs_samelabel(wavs, labels, alpha=alpha, beta=beta)
-                        others[0] = tuple(labels_mixed)
-                        print('wavs_mixed: ',wavs_mixed.shape)
-                        print(others[0])
+                    wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]                    
 
                     if self.upstream.trainable:
                         features = self.upstream.model(wavs)
                     else:
                         with torch.no_grad():
                             features = self.upstream.model(wavs)
-                    '''
-                    # Modified: Added checkpoint
-                    if self.upstream.trainable:
-                        print('do Checkpoint')
-                        features = checkpoint(self.upstream.model, wavs)
-                    else:
-                        with torch.no_grad():
-                            print('do Checkpoint')
-                            features = checkpoint(self.upstream.model, wavs)
-                    '''
+                    
                     features = self.featurizer.model(wavs, features)
 
                     if specaug:

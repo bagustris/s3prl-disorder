@@ -21,17 +21,18 @@ downstream_expert:
     audiotype: phrase   # audiotype='phrase','aiu','a_n': denpend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
     gender: both        # gender='both','male','female': depend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
     oracle: 0           # oracle='0', '1': Testing with the same train partition
-    augment_list: trainAVFAD-SVD  # augment_list: 'trainAVFAD-SVD': label of the augment list just in case you have different augment lists
-    augment_type: NONE 
-    mixup_alpha: 0.1    
+    augment_list: NONE  # augment_list: 'trainAVFAD-SVD': label of the augment list just in case you have different augment lists
+    augment_type: mixup_wavs
+    mixup_alpha: 0.1  
+    mixup_beta: 0.1   
     batch_augment_n: 1 
 
   datarc:
     root: downstream/voicedisorder/
     test_fold: fold1
     pre_load: True
-    train_batch_size: 4 
-    eval_batch_size: 4
+    train_batch_size: 16 
+    eval_batch_size: 16
     num_workers: 4
     valid_ratio: 0.2
   

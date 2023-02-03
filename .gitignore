@@ -164,7 +164,7 @@ libri_alignment.zip
 *.pth
 
 # experiment files
-*.png
+#*.png
 *.pkl
 #*.yaml
 *.sh

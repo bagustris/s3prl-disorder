@@ -29,6 +29,7 @@ downstream_expert:
                                   #               'LABEL': Use data/lst/train_'audiotype'_'gender'_LABEL_meta_data_fold*.json
     augment_type: NONE # augment_type='NONE','mixup','batch'
     mixup_alpha: 0.1    # mixup_alpha= numerical value 0-1
+    mixup_beta: 0.1     # mixup_beta= numerical value 0-1
     batch_augment_n: 1  # batch_augment_n= numerical value 1,2,3,etc: number of times batch is augmented, one time=1, two times=2, ten times = 10
     
   datarc:

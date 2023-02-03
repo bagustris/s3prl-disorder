@@ -106,26 +106,23 @@ def compute_plots_loss(path_file):
         elif a[0] == 'test': 
             test_loss.append(float(a[4][5:].split('\n')[0]))
     
-            e = len(epoch)
-            plt.figure()
-            plt.plot(epoch,dev_loss,'b')
-            #plt.plot(epoch[0:len(test_loss)],test_loss,'r')
-            plt.plot(epoch,test_loss[0:e],'r')
-            plt.title('Loss')
-            plt.legend(('dev','test'))
-            plt.grid(True)
-            
-            manager = plt.get_current_fig_manager() #fullscreen
-            manager.full_screen_toggle()
-            pathfigure=os.path.dirname(path_file)+'/loss_by_epoch.png'
-            plt.savefig(pathfigure)
-
+    plt.figure()
+    plt.plot(epoch,dev_loss,'b')
+    plt.plot(epoch[0:len(test_loss)],test_loss,'r')
+    plt.title('Loss')
+    plt.legend(('dev','test'))
+    plt.grid(True)
+    
+    manager = plt.get_current_fig_manager() #fullscreen
+    manager.full_screen_toggle()
+    pathfigure=os.path.dirname(path_file)+'/loss_by_epoch.png'
+    plt.savefig(pathfigure)
 
 # Data augmentation
-def mixup_data(x, y, alpha=0.1, beta=0.1, use_cuda=False):
+def mixup_data(x, y, alpha=0.1, use_cuda=False):
     '''Returns mixed inputs, pairs of target and lambda '''
     if alpha > 0:
-        lam = np.random.beta(alpha,beta)
+        lam = np.random.beta(alpha,alpha)
     else:
         lam = 1
 
@@ -134,70 +131,14 @@ def mixup_data(x, y, alpha=0.1, beta=0.1, use_cuda=False):
     mixed_x = lam * x + (1 - lam) * x[index,:,:]
     index = index.tolist()
     y = np.asarray(y)
-    y_b = y[index]
-    
-    return mixed_x, y, y_b, lam
+    y_a, y_b = y, y[index]
+    return mixed_x, y_a, y_b, lam
 
-def mixup_data_samelabel(x, y, alpha=0.1, beta=0.1, use_cuda=False):
-    '''Returns mixed inputs pairs of target and lambda. 
-    But mixing feature vectors with the same label (for the binary label case), 
-    such that features with label 1 are only mixed with features with label 1, and so on.'''
-    if alpha > 0:
-        lam = np.random.beta(alpha,beta)
-    else:
-        lam = 1
-
-    y = np.asarray(y)
-
-    x0 = x[y==0]
-    y0 = y[y==0]
-    batch_size = x0.size()[0]    
-    index0 = torch.randperm(batch_size)
-    mixed_x0 = lam * x0 + (1 - lam) * x0[index0,:,:]
-    
-    x1 = x[y==1]
-    y1 = y[y==1]
-    batch_size = x1.size()[0]    
-    index1 = torch.randperm(batch_size)
-    mixed_x1 = lam * x1 + (1 - lam) * x1[index1,:,:]
-        
-    '''
-    print('Shape x:')
-    print(x.shape)
-    print('Shape x0:')
-    print(x0.shape)
-    print('Shape y:')
-    print(y.shape)
-    print('Shape y0:')
-    print(y0.shape)
-    print('Shape y1:')
-    print(y1.shape)
-    print('Lam:')
-    print(lam)
-    '''
-
-    mixed_x = torch.cat((mixed_x0,mixed_x1))
-    y_b = np.concatenate((y0[index0.tolist()],y1[index1.tolist()]))
-    index = torch.randperm(mixed_x.size()[0])
-    mixed_out = mixed_x[index,:,:]
-    y_out = y_b[index.tolist()]
-    
-    print('Shape mixed_x:')
-    print(mixed_x.shape)
-    print('y:')
-    print(y)
-    print('y_b:')
-    print(y_b)
-    print('y_out:')
-    print(y_out)
-    
-    return mixed_out, y, y_out, lam
-
-def batch_distortion_augment(x, y, n, alpha=0.1, beta=0.1): 
+def batch_distortion_augment(x, y, n, alpha=0.1): 
     x_temp = torch.clone(x)
     y_temp = y
     for _ in range(n):
-        mixed_x, y_a, y_b, lam = mixup_data(x, y, alpha, beta)
+        mixed_x, y_a, y_b, lam = mixup_data(x, y, alpha)
         x_temp = torch.cat((x_temp, mixed_x))
         y_temp = np.concatenate((y_temp, y_b))    
     '''
@@ -208,23 +149,8 @@ def batch_distortion_augment(x, y, n, alpha=0.1, beta=0.1):
     '''
     return x_temp, y_temp
 
-def batch_distortion_augment_samelabel(x, y, n, alpha=0.1, beta=0.1): 
-    x_temp = torch.clone(x)
-    y_temp = y
-    for _ in range(n):
-        mixed_x, y_a, y_b, lam = mixup_data_samelabel(x, y, alpha, beta)
-        x_temp = torch.cat((x_temp, mixed_x))  #Concat the original with the new mixed versions
-        y_temp = np.concatenate((y_temp, y_b))  
-
-    print('Shape batch size:')
-    print(x.shape)  
-    print('Shape new batch size:')
-    print(x_temp.shape)    
-
-    return x_temp, y_temp
-
-def mixup_criterion(criterion, predicted, y_a, y_b, lam):
-    return lam * criterion(predicted, y_a) + (1-lam) * criterion(predicted, y_b)
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    return lam * criterion(pred, y_a) + (1-lam) * criterion(pred, y_b)
 
 
 
@@ -328,54 +254,26 @@ class DownstreamExpert(nn.Module):
         
         # Data augmentation
         alpha = self.listrc['mixup_alpha']
-        beta = self.listrc['mixup_beta']
         aug_type = self.listrc['augment_type']
-        
-        print('\nmode:',mode,', start labels:',labels,sep=" ")
-
-        if mode=='test' or mode=='dev':
+        if aug_type == 'mixup':           
+            mixed_features, y_a, y_b, lam = mixup_data(features, labels, alpha)
+            mixed_features, y_a, y_b = Variable(mixed_features), Variable(torch.from_numpy(y_a).cuda()), Variable(torch.from_numpy(y_b).cuda())
+            predicted, features_pooled = self.model(mixed_features, features_len)
+            loss = mixup_criterion(self.objective, predicted, y_a, y_b, lam)
+            labels = y_a
+        elif aug_type == 'batch':
+            batchN = np.max((1,self.listrc['batch_augment_n']))  # Ensure a minimum value of 1, duplicate the batch
+            features, labels = batch_distortion_augment(features, labels, batchN)
+            labels = torch.LongTensor(labels).to(features.device)
+            predicted, features_pooled = self.model(features, features_len)
+            loss = self.objective(predicted, labels)
+        # -------------------------------------------------------
+        else:
             predicted, features_pooled = self.model(features, features_len) # Meaning: predicted=logit, features_pooled=embedding
             labels = torch.LongTensor(labels).to(features.device)
             loss = self.objective(predicted, labels)
-        elif mode=='train':
-            if aug_type == 'mixup':           
-                mixed_features, y_a, y_b, lam = mixup_data(features, labels, alpha, beta)
-                mixed_features, y_a, y_b = Variable(mixed_features), Variable(torch.from_numpy(y_a).cuda()), Variable(torch.from_numpy(y_b).cuda())
-                predicted, features_pooled = self.model(mixed_features, features_len)
-                loss = mixup_criterion(self.objective, predicted, y_a, y_b, lam)
-                #labels = y_a
-                labels = torch.LongTensor(labels).to(features.device)
-            elif aug_type == 'mixup_samelabel':           
-                mixed_features, y_a, y_b, lam = mixup_data_samelabel(features, labels, alpha, beta)
-                mixed_features, y_a, y_b = Variable(mixed_features), Variable(torch.from_numpy(y_a).cuda()), Variable(torch.from_numpy(y_b).cuda())
-                predicted, features_pooled = self.model(mixed_features, features_len)
-                loss = mixup_criterion(self.objective, predicted, y_a, y_b, lam)
-                #labels = y_a
-                labels = torch.LongTensor(labels).to(features.device)
-            elif aug_type == 'batch':
-                batchN = np.max((1,self.listrc['batch_augment_n']))  # Ensure a minimum value of 1, duplicate the batch
-                features, labels = batch_distortion_augment(features, labels, batchN, alpha, beta)
-                features_len = torch.IntTensor([len(feat) for feat in features]).to(device=device)
-                labels = torch.LongTensor(labels).to(features.device)
-                predicted, features_pooled = self.model(features, features_len)
-                loss = self.objective(predicted, labels)
-            elif aug_type == 'batch_samelabel':
-                batchN = np.max((1,self.listrc['batch_augment_n']))  # Ensure a minimum value of 1, duplicate the batch
-                print(features.shape)
-                print(features_len.shape)
-                features, labels = batch_distortion_augment_samelabel(features, labels, batchN, alpha, beta)
-                features_len = torch.IntTensor([len(feat) for feat in features]).to(device=device)
-                print(features.shape)
-                print(features_len.shape)
-                labels = torch.LongTensor(labels).to(features.device)
-                predicted, features_pooled = self.model(features, features_len)
-                loss = self.objective(predicted, labels)
-            else:
-                predicted, features_pooled = self.model(features, features_len) # Meaning: predicted=logit, features_pooled=embedding
-                labels = torch.LongTensor(labels).to(features.device)
-                loss = self.objective(predicted, labels)
 
-
+        
         predicted_classid = predicted.max(dim=-1).indices
         records['acc'] += (predicted_classid == labels).view(-1).cpu().float().tolist()
         records['loss'].append(loss.item())
@@ -392,7 +290,7 @@ class DownstreamExpert(nn.Module):
         records['score_1'] += score[:,1].view(-1).cpu().float().tolist()
 
         # Write embeddings
-        #if mode=='test' and features_pooled!=None and self.visualrc['embeddings']==1: #When is uncommented onloy write embeddings for test
+        #if mode=='test' and features_pooled!=None and self.visualrc['embeddings']==1:
         values = records['acc']
         average = torch.FloatTensor(values).mean().item()
         best = 0
@@ -401,48 +299,13 @@ class DownstreamExpert(nn.Module):
         if best==1 and features_pooled!=None and self.visualrc['embeddings']==1:
             emb_path = self.expdir + '/embeddings/' + mode
             if not os.path.exists(emb_path): os.makedirs(emb_path)
-
-            if mode=='train':
-                # Write embeddings for mixup or batch augmentation
-                if aug_type == 'mixup' or aug_type == 'mixup_samelabel' or aug_type == 'batch' or aug_type == 'batch_samelabel':
-                    if not os.path.exists(emb_path+'_'+aug_type): os.makedirs(emb_path+'_'+aug_type)
-                    print('mode:',mode,', mixup:',y_b,sep=" ")
-                    for i in range(0,len(filenames)):
-                        with open(emb_path+'_'+aug_type+'/'+filenames[i]+'.pkl','wb') as fid:
-                            data = []
-                            data.append(np.asscalar(y_b[i].cpu().detach().numpy()))
-                            data.append(mixed_features[i].cpu().detach().numpy())
-                            data.append(features_pooled[i].cpu().detach().numpy())
-                            pickle.dump(data, fid, protocol=pickle.HIGHEST_PROTOCOL)
-                    
-                    _, features_pooled_original = self.model(features, features_len) # Meaning: predicted=logit, features_pooled=embedding
-                    print('mode:',mode,', original:',labels,sep=" ")
-                    for i in range(0,len(filenames)):
-                        with open(emb_path+'/'+filenames[i]+'.pkl','wb') as fid:
-                            data = []
-                            data.append(np.asscalar(labels[i].cpu().detach().numpy()))
-                            data.append(features[i].cpu().detach().numpy())
-                            data.append(features_pooled_original[i].cpu().detach().numpy())
-                            pickle.dump(data, fid, protocol=pickle.HIGHEST_PROTOCOL)    
-                # Write embeddings for standard case without any mixup or batch augmentation
-                else: 
-                    print('mode:',mode,', no augment:',labels,sep=" ")
-                    for i in range(0,len(filenames)):
-                        with open(emb_path+'/'+filenames[i]+'.pkl','wb') as fid:
-                            data = []
-                            data.append(np.asscalar(labels[i].cpu().detach().numpy()))
-                            data.append(features[i].cpu().detach().numpy())
-                            data.append(features_pooled[i].cpu().detach().numpy())
-                            pickle.dump(data, fid, protocol=pickle.HIGHEST_PROTOCOL)
-            elif mode=='test' or mode=='dev':
-                print('no augment',mode,labels,sep=" ")
-                for i in range(0,len(filenames)):
-                    with open(emb_path+'/'+filenames[i]+'.pkl','wb') as fid:
-                        data = []
-                        data.append(np.asscalar(labels[i].cpu().detach().numpy()))
-                        data.append(features[i].cpu().detach().numpy())
-                        data.append(features_pooled[i].cpu().detach().numpy())
-                        pickle.dump(data, fid, protocol=pickle.HIGHEST_PROTOCOL)
+            for i in range(0,len(filenames)):
+                with open(emb_path+'/'+filenames[i]+'.pkl','wb') as fid:
+                    data = []
+                    data.append(np.asscalar(labels[i].cpu().detach().numpy()))
+                    data.append(features[i].cpu().detach().numpy())
+                    data.append(features_pooled[i].cpu().detach().numpy())
+                    pickle.dump(data, fid, protocol=pickle.HIGHEST_PROTOCOL)
         return loss
 
     # interface
@@ -466,7 +329,6 @@ class DownstreamExpert(nn.Module):
         
         save_names = []
         for key in ["acc", "loss"]:
-            print(key)
             values = records[key]
             average = torch.FloatTensor(values).mean().item()
             logger.add_scalar(
@@ -477,20 +339,21 @@ class DownstreamExpert(nn.Module):
             # Write log with ACC, AUC, EER
             with open(Path(self.expdir) / "log_acc_auc.log", 'a') as f:
                 if key == 'acc':
-                    print(mode+' ACC='+str(average)+' UAR='+str(uar_value)+' AUC='+str(auc_value)+' EER='+str(eer_value))
+                    print(mode+'ACC='+str(average)+' UAR='+str(uar_value)+' AUC='+str(auc_value)+' EER='+str(eer_value))
                     f.write(f'{mode} at step {global_step}: {key}={average}, UAR={uar_value}, AUC={auc_value}, EER={eer_value}\n')
                     if mode == 'dev' and average > self.best_score:
                         self.best_score = torch.ones(1) * average
                         f.write(f'New best on {mode} at step {global_step}: ACC={average}, UAR={uar_value}, AUC={auc_value}, EER={eer_value}\n')
                         save_names.append(f'{mode}-best.ckpt')
-            if mode == 'test': compute_plots(self.expdir+"/log_acc_auc.log")  
-            
+            if mode == 'test': compute_plots(self.expdir+"/log_acc_auc.log") 
+
             # Write log with Loss
             with open(Path(self.expdir) / "log_loss.log", 'a') as f:
                 if key == 'loss':
                     print(mode+' Loss='+str(average))
                     f.write(f'{mode} at step {global_step}: {key}={average}\n')
                     if mode == 'test': compute_plots_loss(self.expdir+"/log_loss.log")  
+            #------------------------------------------------------ 
             #------------------------------------------------------
 
         if mode in ["dev", "test"]:

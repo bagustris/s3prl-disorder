@@ -61,6 +61,10 @@ cd fairseq
 python -m pip install --editable ./
 ```
 
+```
+python setup.py build develop
+```
+
 6. Install **torch** (if you already have your own torch skip this step)
 
 ```
