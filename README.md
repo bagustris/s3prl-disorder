@@ -34,8 +34,9 @@ git clone https://github.com/dayanavivolab/s3prl.git -b voicedisorder
 2. Create and activate environment (Python >= 3.6)
 
 ``` 
-python -m venv /scratch/user/miniconda3/envs/s3prl
-source /scratch/user/miniconda3/envs/s3prl/bin/activate
+cd s3prl
+python -m venv s3prl_voicedisorder
+source s3prl_voicedisorder
 ```
 
 3. Install **sox** 
