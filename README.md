@@ -28,7 +28,7 @@ For running an experiment you need to clone the repo and install S3PRL toolkit a
 1. Clone repo
 
 ```
-git clone https://github.com/dayanavivolab/s3prl.git 
+git clone https://github.com/dayanavivolab/s3prl.git -b voicedisorder
 ```
 
 2. Create and activate environment (Python >= 3.6)
