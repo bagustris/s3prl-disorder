@@ -249,6 +249,7 @@ class DownstreamExpert(nn.Module):
         print(f"[Expert] - using the testing fold: \"{self.fold}\". Ps. Use -o config.downstream_expert.datarc.test_fold=fold2 to change test_fold in config.")
 
         # Create train/test list (json) path
+        '''
         augment_list=self.listrc['augment_list']
         if augment_list=='NONE':
             train_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+ self.fold +'.json')
@@ -261,7 +262,13 @@ class DownstreamExpert(nn.Module):
         else:
             test_path = os.path.join(DATA_ROOT, 'data/lst', 'test_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+ self.fold +'.json')
         print(f'[Expert] - Testing path: {test_path}')
-        
+        '''
+
+        train_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+self.listrc['traindata']+'_'+self.fold +'.json')
+        print(f'[Expert] - Training path: {train_path}')
+        test_path = os.path.join(DATA_ROOT, 'data/lst', 'test_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+self.listrc['testdata']+'_'+self.fold +'.json')
+        print(f'[Expert] - Testing path: {test_path}')
+
         # Loading train/test dataset 
         dataset = SaarbrueckenDataset(DATA_ROOT, train_path, self.datarc['pre_load'])
         trainlen = int((1 - self.datarc['valid_ratio']) * len(dataset))
@@ -328,7 +335,9 @@ class DownstreamExpert(nn.Module):
         
         # Data augmentation
         alpha = self.listrc['mixup_alpha']
-        beta = self.listrc['mixup_beta']
+        try: beta = self.listrc['mixup_beta']
+        except: beta=alpha
+            
         aug_type = self.listrc['augment_type']
         
         print('\nmode:',mode,', start labels:',labels,sep=" ")
@@ -386,10 +395,10 @@ class DownstreamExpert(nn.Module):
 
         # Write logit 
         m = nn.Softmax(dim=1)
-        score = m(predicted)
-        records['score'] += score
-        records['score_0'] += score[:,0].view(-1).cpu().float().tolist()
-        records['score_1'] += score[:,1].view(-1).cpu().float().tolist()
+        score_normalizado = m(predicted)
+        records['score'] += predicted
+        records['score_0'] += predicted[:,0].view(-1).cpu().float().tolist()
+        records['score_1'] += predicted[:,1].view(-1).cpu().float().tolist()
 
         # Write embeddings
         #if mode=='test' and features_pooled!=None and self.visualrc['embeddings']==1: #When is uncommented onloy write embeddings for test
@@ -470,7 +479,7 @@ class DownstreamExpert(nn.Module):
             values = records[key]
             average = torch.FloatTensor(values).mean().item()
             logger.add_scalar(
-                f'pathologies-{self.fold}/{mode}-{key}',
+                f'voicedisorder-{self.fold}/{mode}-{key}',
                 average,
                 global_step=global_step
             )

@@ -18,7 +18,7 @@ s3prl/downstream/voicedisorder/expert_mixup.py
 s3prl/result
 #s3prl/run_voicedisorder_finetune.sh
 #s3prl/run_voicedisorder_basic.sh
-#s3prl/condor_run_voicedisorder.sh
+s3prl/condor_run_voicedisorder.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -167,7 +167,7 @@ libri_alignment.zip
 #*.png
 *.pkl
 #*.yaml
-*.sh
+#*.sh
 *.pt
 *.tar
 *.h5
