@@ -9,11 +9,9 @@ audiotype=$1    # phrase, aiu, a_n
 upstream=$2     # wavlm, hubert, fft, opensmile
 model=$3        # Transformer, CNNSelfAtt, MLP
 
-#folds=1 # "2 3 4 5"
-#for test_fold in folds; do
+folds="1 2 3 4 5"
+for test_fold in folds; do
     
-    test_fold="1"
-
     # TRAIN basic 
     if [[ "$type" == "basic" ]]
     then
@@ -28,4 +26,4 @@ model=$3        # Transformer, CNNSelfAtt, MLP
     
     # EVALUATION
     $python run_downstream.py -m evaluate -e result/downstream/dis${type}_${audiotype}_${upstream}_${model}_$test_fold/dev-best.ckpt
-#done
+#one

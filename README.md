@@ -16,10 +16,13 @@ So far the databases included in this downstream are the following (both are fre
 (http://www.stimmdatenbank.coli.uni-saarland.de/help_en.php4)
 * **AVFAD** Advanced Voice Function Assessment Database 
 (http://acsa.web.ua.pt/AVFAD.htm)
+* **THALENTO** ViVoLab Database for Automatic Detection of Voice Disorders (Under construction, soon release)
+(http://dihana.cps.unizar.es/~thalento/)
 
 You need to locate the datasets in the following directories (see the audio path format in downstream/voicedisorder/data/lst/*.json): 
 - downstream/voicedisorder/data/audio/Saarbruecken
 - downstream/voicedisorder/data/audio/AVFAD
+- downstream/voicedisorder/data/audio/THALENTO
 
 ## Usage
 For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated at https://github.com/s3prl/s3prl).
@@ -66,9 +69,14 @@ pip install requirements_voicedisorder.txt
 ```
 
 ### Run experiment
-For running experiments you can use:   
+For running experiments to do train and evaluation you can use (modify accordingly):   
 ```
 sh run_voicedisorder.sh 
+```
+
+For doing evaluation of a certain list of audios using a pretrained model you can use (modify accordingly):   
+```
+sh run_voicedisorder_evaluation.sh 
 ```
 
 ## Configuration
