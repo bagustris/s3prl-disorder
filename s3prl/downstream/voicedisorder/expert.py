@@ -262,12 +262,18 @@ class DownstreamExpert(nn.Module):
         else:
             test_path = os.path.join(DATA_ROOT, 'data/lst', 'test_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+ self.fold +'.json')
         print(f'[Expert] - Testing path: {test_path}')
-        '''
-
+        
         train_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+self.listrc['traindata']+'_'+self.fold +'.json')
         print(f'[Expert] - Training path: {train_path}')
         test_path = os.path.join(DATA_ROOT, 'data/lst', 'test_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+self.listrc['testdata']+'_'+self.fold +'.json')
         print(f'[Expert] - Testing path: {test_path}')
+        '''
+
+        train_path = os.path.join(DATA_ROOT, 'data/lst', self.listrc['traindata']+'_'+self.fold +'.json')
+        print(f'[Expert] - Training path: {train_path}')
+        test_path = os.path.join(DATA_ROOT, 'data/lst', self.listrc['testdata']+'_'+self.fold +'.json')
+        print(f'[Expert] - Testing path: {test_path}')
+        
 
         # Loading train/test dataset 
         dataset = SaarbrueckenDataset(DATA_ROOT, train_path, self.datarc['pre_load'])
@@ -513,7 +519,7 @@ class DownstreamExpert(nn.Module):
 
             # Write score (logit)
             with open(Path(self.expdir) / f"{mode}_{self.fold}_truth_predict_score.txt", "w") as file:
-                line = [f"{f} {t} {p} {s}\n" for f, t, p, s in zip(records["filename"], records["truth"], records["predict"], records["score_1"])]
+                line = [f"{f} {t} {p} {s1} {s0}\n" for f, t, p, s1, s0 in zip(records["filename"], records["truth"], records["predict"], records["score_1"], records["score_0"])]
                 file.writelines(line)
             #---------------------------------
 

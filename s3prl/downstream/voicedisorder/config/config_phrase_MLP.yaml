@@ -20,9 +20,9 @@ downstream_expert:
   listrc:
     audiotype: phrase   # audiotype='phrase','aiu','a_n': denpend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
     gender: both        # gender='both','male','female': depend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
-    oracle: 0           # oracle='0', '1': Testing with the same train partition
-    augment_list: NONE   #NONE        
-    augment_type: mixup_samelabel 
+    traindata: AVFAD-SVD
+    testdata: SVD    
+    augment_type: NONE
     mixup_alpha: 0.1  
     mixup_beta: 0.1    
     batch_augment_n: 1  

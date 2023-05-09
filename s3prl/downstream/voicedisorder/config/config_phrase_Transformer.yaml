@@ -1,5 +1,5 @@
 runner:
-  total_steps: 50000
+  total_steps: 30000
   gradient_clipping: 1
   gradient_accumulate_steps: 8
 
@@ -14,15 +14,17 @@ runner:
 optimizer:
   name: TorchOptim
   torch_optim_name: Adam
-  lr: 1.0e-4
+  lr: 1.0e-5
 
 downstream_expert:
   listrc:
     audiotype: phrase   # audiotype='phrase','aiu','a_n': denpend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
     gender: both        # gender='both','male','female': depend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
-    oracle: 0           # oracle='0', '1': Testing with the same train partition
-    augment_list: NONE         
-    augment_type: mixup_samelabel 
+    #oracle: 0           # oracle='0', '1': Testing with the same train partition
+    #augment_list: NONE         
+    traindata: AVFAD-SVD
+    testdata: SVD
+    augment_type: none
     mixup_alpha: 0.1  
     mixup_beta: 0.1  
     batch_augment_n: 1  
@@ -38,7 +40,7 @@ downstream_expert:
   
   visualrc:
     roc: 0            # roc='0','1': compute roc curve at each eval_step
-    embeddings: 1     # embeddings: '0','1': write embeddings at each eval step
+    embeddings: 0    # embeddings: '0','1': write embeddings at each eval step
 
   modelrc:
     projector_dim: 512
