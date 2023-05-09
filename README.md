@@ -10,7 +10,6 @@ In this branch there is a downstream for Automatic Voice Disorder Detection (AVD
 </p>
 
 ## Databases 
-
 So far the databases included in this downstream are the following (both are free available):
 * **SVD** Saarbruecken Voice Database 
 (http://www.stimmdatenbank.coli.uni-saarland.de/help_en.php4)
@@ -18,11 +17,6 @@ So far the databases included in this downstream are the following (both are fre
 (http://acsa.web.ua.pt/AVFAD.htm)
 * **THALENTO** ViVoLab Database for Automatic Detection of Voice Disorders (Under construction, soon release)
 (http://dihana.cps.unizar.es/~thalento/)
-
-You need to locate the datasets in the following directories (see the audio path format in downstream/voicedisorder/data/lst/*.json): 
-- downstream/voicedisorder/data/audio/Saarbruecken
-- downstream/voicedisorder/data/audio/AVFAD
-- downstream/voicedisorder/data/audio/THALENTO
 
 ## Usage
 For running an experiment you need to clone the repo and install S3PRL toolkit as authors indicated at https://github.com/s3prl/s3prl).
@@ -70,16 +64,26 @@ pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f htt
 
 7. Install packages
 ```
-pip install requirements_voicedisorder.txt
+(NO) pip install requirements_voicedisorder.txt
 ```
 
 ### Run experiment
-For running experiments to do train and evaluation you can use (modify accordingly):   
+
+1. Locate databases
+First you need to locate the datasets in the following directories (see the audio path format in downstream/voicedisorder/data/lst/*.json): 
+- downstream/voicedisorder/data/audio/Saarbruecken
+- downstream/voicedisorder/data/audio/AVFAD
+- downstream/voicedisorder/data/audio/THALENTO
+
+2. Configuration
+Select a config file according to your experiment in downstream/voicedisorder/data/config and modify it according to the experiment requirements. 
+
+3. For running experiments to do train and evaluation you can use (modify accordingly):   
 ```
 sh run_voicedisorder.sh 
 ```
 
-For doing evaluation of a certain list of audios using a pretrained model you can use (modify accordingly):   
+3a. For running only evaluation of a certain list of audios using a pretrained model you can use (modify accordingly):   
 ```
 sh run_voicedisorder_evaluation.sh 
 ```
