@@ -51,7 +51,7 @@ apt-get install sox
 4. Install **s3prl**
 
 ```
-python -m pip install -e ./
+pip install -e ./
 ```
 
 5. Install **fairseq**
@@ -59,7 +59,7 @@ python -m pip install -e ./
 ```
 git clone https://github.com/pytorch/fairseq
 cd fairseq
-python -m pip install --editable ./
+pip install --editable ./
 ```
 
 6. Install **torch** (if you already have your own torch skip this step)
