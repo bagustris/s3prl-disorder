@@ -26,4 +26,4 @@ for test_fold in folds; do
     
     # EVALUATION
     $python run_downstream.py -m evaluate -e result/downstream/dis${type}_${audiotype}_${upstream}_${model}_$test_fold/dev-best.ckpt
-#one
+

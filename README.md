@@ -39,10 +39,15 @@ git clone https://github.com/dayanavivolab/s3prl.git -b voicedisorder
 ``` 
 cd s3prl
 python -m venv s3prl_voicedisorder
-source s3prl_voicedisorder
+source s3prl_voicedisorder/bin/activate
+pip install --upgrade pip (optional)
 ```
 
 3. Install **sox** 
+
+```
+apt-get install sox
+```
 4. Install **s3prl**
 
 ```
