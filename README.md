@@ -56,26 +56,24 @@ cd fairseq
 pip install --editable ./
 ```
 
-6. Install **torch** (if you already have your own torch skip this step)
+6. Install **torch** (if you already have your own torch skip this step) and other packages
 
 ```
 pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
-```
-
-7. Install packages
-```
-(NO) pip install requirements_voicedisorder.txt
+pip install tensorboard
 ```
 
 ### Run experiment
 
 1. Locate databases
+
 First you need to locate the datasets in the following directories (see the audio path format in downstream/voicedisorder/data/lst/*.json): 
 - downstream/voicedisorder/data/audio/Saarbruecken
 - downstream/voicedisorder/data/audio/AVFAD
 - downstream/voicedisorder/data/audio/THALENTO
 
 2. Configuration
+
 Select a config file according to your experiment in downstream/voicedisorder/data/config and modify it according to the experiment requirements. 
 
 3. For running experiments to do train and evaluation you can use (modify accordingly):   
@@ -94,6 +92,47 @@ But first, please configurate the script accordingly by choosing:
 * Audiotype: phrase, aiu, a_n
 * Frontend: wavlm, hubert, wav2vec, fft (see more upstreams at https://github.com/s3prl/s3prl)
 * Backend: Transformer, CNNSelfAtt, MLP
+
+|               |                           |                            |
+|---------------|---------------------------|----------------------------|
+| **Runner**    |                           |                            |
+| total_steps   | 30000                     |                            |
+| gradient_clipping | 1                    |                            |
+| gradient_accumulate_steps | 8            |                            |
+| log_step      | 500                       |                            |
+| eval_step     | 100                       |                            |
+| save_step     | 100                       |                            |
+| max_keep      | 1                         |                            |
+| eval_dataloaders | dev, test              |                            |
+| **Optimizer** |                           |                            |
+| name          | TorchOptim                |                            |
+| torch_optim_name | Adam                   |                            |
+| lr            | 1.0e-5                    |                            |
+| **Downstream Expert** |                    |                            |
+| listrc        |                           |                            |
+| audiotype     | phrase                    | audiotype='phrase','aiu','a_n'  |
+| gender        | both                      | gender='both','male','female'  |
+| traindata     | train_phrase_both_meta_data_AVFAD-SVD20min |                          |
+| testdata      | SVD                       |                            |
+| augment_type  | none                      |                            |
+| mixup_alpha   | 1                         |                            |
+| mixup_beta    | 1                         |                            |
+| batch_augment_n | 1                        |                            |
+| datarc        |                           |                            |
+| root          | downstream/voicedisorder/ |                            |
+| test_fold     | fold1                     |                            |
+| pre_load      | True                      |                            |
+| train_batch_size | 16                      |                            |
+| eval_batch_size | 16                       |                            |
+| num_workers   | 4                         |                            |
+| valid_ratio   | 0.2                       |                            |
+| visualrc      |                           |                            |
+| roc           | 0                         | roc='0','1': compute roc curve at each eval_step |
+| embeddings    | 0                         | embeddings: '0','1': write embeddings at each eval step |
+| modelrc       |                           |                            |
+| projector_dim | 512                       |                            |
+| select        | Transformer               | Classifier selection: 'Transformer','DeepModel','UtteranceLevel' |
+
 
 Also, see the following table with a description of the config files at s3prl/downstream/voicedisorder/config.
 

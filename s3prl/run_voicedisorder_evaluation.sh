@@ -12,7 +12,7 @@ ISSUE=$5            # select a name for your experiment
 type=$6             # finetune, basic
 seed=$7             # select a number for the seed 
 
-name_eval_folder=calibration_2min       # Select a name for the evaluation results
+name_eval_folder=calibration_15min       # Select a name for the evaluation results
 
 $python run_downstream.py -m evaluate -u ${upstream} -d voicedisorder -c "downstream/voicedisorder/config/config_${audiotype}_finetune_${model}.yaml" -n dis${type}_${audiotype}_${upstream}_${model}_${ISSUE}_seed${seed}_$test_fold/$name_eval_folder -i result/downstream/dis${type}_${audiotype}_${upstream}_${model}_${ISSUE}_seed${seed}_$test_fold/dev-best.ckpt -o "config.downstream_expert.datarc.test_fold='$test_fold'"
 
