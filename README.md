@@ -93,52 +93,36 @@ But first, please configurate the script accordingly by choosing:
 * Frontend: wavlm, hubert, wav2vec, fft (see more upstreams at https://github.com/s3prl/s3prl)
 * Backend: Transformer, CNNSelfAtt, MLP
 
-|               |                           |                            |
+|  Parameter    | Value                     | Notes                      |
 |---------------|---------------------------|----------------------------|
-| **Runner**    |                           |                            |
-| total_steps   | 30000                     |                            |
-| gradient_clipping | 1                    |                            |
-| gradient_accumulate_steps | 8            |                            |
-| log_step      | 500                       |                            |
-| eval_step     | 100                       |                            |
-| save_step     | 100                       |                            |
-| max_keep      | 1                         |                            |
-| eval_dataloaders | dev, test              |                            |
-| **Optimizer** |                           |                            |
+| **Module: Runner**                                                     |
+| total_steps   | numerical value           | Number of epochs/iterations for training the model (ex: 30000)|
+| log_step      | numerical value           | Each this number of epochs save a log file (ex: 500)        |
+| eval_step     | numerical value           | Each this number of epochs evaluate the model (ex: 100)     |
+| save_step     | numerical value           | Each this number of epochs save a checkpoint of the model (ex: 100)   |
+| **Module: Optimizer**                                                  |
 | name          | TorchOptim                |                            |
-| torch_optim_name | Adam                   |                            |
-| lr            | 1.0e-5                    |                            |
-| **Downstream Expert** |                    |                            |
-| listrc        |                           |                            |
-| audiotype     | phrase                    | audiotype='phrase','aiu','a_n'  |
-| gender        | both                      | gender='both','male','female'  |
-| traindata     | train_phrase_both_meta_data_AVFAD-SVD20min |                          |
-| testdata      | SVD                       |                            |
-| augment_type  | none                      |                            |
-| mixup_alpha   | 1                         |                            |
-| mixup_beta    | 1                         |                            |
-| batch_augment_n | 1                        |                            |
-| datarc        |                           |                            |
-| root          | downstream/voicedisorder/ |                            |
-| test_fold     | fold1                     |                            |
-| pre_load      | True                      |                            |
-| train_batch_size | 16                      |                            |
-| eval_batch_size | 16                       |                            |
-| num_workers   | 4                         |                            |
-| valid_ratio   | 0.2                       |                            |
-| visualrc      |                           |                            |
-| roc           | 0                         | roc='0','1': compute roc curve at each eval_step |
-| embeddings    | 0                         | embeddings: '0','1': write embeddings at each eval step |
-| modelrc       |                           |                            |
-| projector_dim | 512                       |                            |
-| select        | Transformer               | Classifier selection: 'Transformer','DeepModel','UtteranceLevel' |
+| torch_optim_name | Adam                   | Namo of the torch optimizer |
+| lr            | numerical value           | Learning rate (Ex: 1.0e-5)  |
+| **Module: listrc**                                                     |
+| audiotype     | phrase, aiu, a_n          | Type of audio in train/test lists |
+| gender        | both, male, female        | Gender of audio in train/test lists |
+| traindata     | train_phrase_both_meta_data_SVD | Name of the training list (ex: train_phrase_both_meta_data_SVD_fold1.json) |
+| testdata      | test_phrase_both_meta_data_SVD | Name of the training list (ex: test_phrase_both_meta_data_SVD_fold1.json) |
+| augment_type  | none, mixup, batch        | Type of method for data augmentation  |
+| mixup_alpha   | numerical value [0,1]     |  Parameter for mixup method |
+| mixup_beta    | numerical value [0,1]     |  Parameter for mixup method | 
+| batch_augment_n | numerical value         |  Number of times the bathc is augmented, one time=1, two times=2, ten times=10 |
+| **Module: datarc**                            |
+| train_batch_size | numerical value        | Size of the batch in training (ex: 4, 16, 32, 64, 128)|
+| eval_batch_size | numerical value         |  Size of the batch in training (ex: 4, 16, 32, 64, 128)|
+| num_workers   | numerical value           | Number of workers           |
+| **Module: visualrc**                                                  |
+| roc           | 0, 1                      | Enable computing ROC curve at each eval_step |
+| embeddings    | 0, 1                      | Enable saving embeddings at each eval step |
+| **Module: modelrc**                                                   |
+| select        | 'Transformer','DeepModel','UtteranceLevel' | Models available for classification |
 
-
-Also, see the following table with a description of the config files at s3prl/downstream/voicedisorder/config.
-
-<p align="center">
-    <img src="./file/S3PRL-disorder-config.png" width="550"/>
-</p>
 
 ### Results
 Experimental results are located in s3prl/result/downstream/yourfoldername.

@@ -22,8 +22,8 @@ downstream_expert:
     gender: both        # gender='both','male','female': depend on the list (data/lst/train_'audiotype'_'gender'_meta_data_fold*.json)
     #oracle: 0           # oracle='0', '1': Testing with the same train partition
     #augment_list: trainAVFAD-SVD  # augment_list: 'trainAVFAD-SVD': label of the augment list just in case you have different augment lists
-    traindata: train_phrase_both_meta_data_AVFAD-SVD20min
-    testdata: SVD #calibration/calibration_15minutes
+    traindata: train_phrase_both_meta_data_AVFAD-SVD
+    testdata: test_phrase_both_meta_data_THALENTO #calibration/SVD20min/calibration_15minutes  #test_phrase_both_meta_data_SVD
     augment_type: none 
     mixup_alpha: 1 
     mixup_beta: 1  
