@@ -151,5 +151,21 @@ If you find this toolkit useful, please consider citing the following paper.
 }
 ```
 
+Related publications: 
+```
+@article{Ribas2023,
+  author={Dayana Ribas and Miguel A. Pastor and Antonio Miguel and David Martínez and Alfonso Ortega and Eduardo Lleida},
+  journal={IEEE Access}, 
+  title={Automatic Voice Disorder Detection Using Self-Supervised Representations}, 
+  year={2023},
+  volume={11},
+  pages={14915-14927},
+  doi={10.1109/ACCESS.2023.3243986}
+}
+```
+
+
 ## Contact
-email: dribas@unizar.es
+email: dribas@unizar.es, lleida@unizar.es
+website: https://vivolab.i3a.es/
+
