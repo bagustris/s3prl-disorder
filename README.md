@@ -58,10 +58,19 @@ pip install --editable ./
 
 6. Install **torch** (if you already have your own torch skip this step) and other packages
 
+for python 3.7:
 ```
 pip install torch==1.8.1+cu111 torchvision==0.9.1+cu111 torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
 pip install tensorboard
 ```
+
+for python 3.10:
+```
+pip install torch==1.11.0+cu113 torchvision==0.12.1+cu113 torchaudio==0.11.0 -f https://download.pytorch.org/whl/torch_stable.html
+pip install tensorboard
+```
+
+If it doesn't work check your cuda version (nvcc --version) and the pytorch version compatible with your python
 
 ### Run experiment
 
@@ -151,5 +160,21 @@ If you find this toolkit useful, please consider citing the following paper.
 }
 ```
 
+Related publications: 
+```
+@article{Ribas2023,
+  author={Dayana Ribas and Miguel A. Pastor and Antonio Miguel and David Martínez and Alfonso Ortega and Eduardo Lleida},
+  journal={IEEE Access}, 
+  title={Automatic Voice Disorder Detection Using Self-Supervised Representations}, 
+  year={2023},
+  volume={11},
+  pages={14915-14927},
+  doi={10.1109/ACCESS.2023.3243986}
+}
+```
+
+
 ## Contact
-email: dribas@unizar.es
+email: dribas@unizar.es, lleida@unizar.es
+website: https://vivolab.i3a.es/
+
