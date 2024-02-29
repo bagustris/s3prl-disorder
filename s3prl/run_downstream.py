@@ -24,6 +24,7 @@ def get_downstream_args():
 
     # train or test for this experiment
     parser.add_argument('-m', '--mode', choices=['train', 'evaluate', 'inference'], required=True)
+    parser.add_argument('-ii', '--inference_filename', default='temp.wav')
     parser.add_argument('-t', '--evaluate_split', default='test')
     parser.add_argument('-o', '--override', help='Used to override args and config, this is at the highest priority')
 
@@ -133,6 +134,13 @@ def get_downstream_args():
         os.makedirs(args.expdir, exist_ok=True)
         args.init_ckpt = ckpt_pth
         config = ckpt['Config']
+
+        # Added by dayi: set embeddings to 1 when reasume from checkpoint
+        with open(args.config, 'r') as file:
+            config_1 = yaml.load(file, Loader=yaml.FullLoader)
+        config['downstream_expert']['visualrc']['embeddings'] = config_1['downstream_expert']['visualrc']['embeddings']
+        config['downstream_expert']['visualrc']['roc'] = config_1['downstream_expert']['visualrc']['roc']
+        config['runner']['total_steps'] = config_1['runner']['total_steps']
 
     else:
         print('[Runner] - Start a new experiment')

@@ -13,6 +13,8 @@ from ..model import *
 from .model import *
 from .dataset import SaarbrueckenDataset, collate_fn
 from .transformer import *
+from .loss import LabelSmoothingCrossEntropy, LogitNormLoss
+from .mixup import *
 
 import pickle
 import numpy as np
@@ -22,24 +24,55 @@ from scipy.interpolate import interp1d
 from scipy.optimize import brentq
 import matplotlib.pyplot as plt
 
+
+
 # Performance metrics 
 def uar(labels_true, labels_predict):
     return balanced_accuracy_score(labels_true, labels_predict)
 
 def auc(labels, scores):
     return roc_auc_score(labels, scores)
-    
+
 def eer(labels, scores, figure=0, pathfigure='default'):
     fpr, tpr, thresholds = roc_curve(labels, scores, pos_label=1)
     eer_value=brentq(lambda x: 1. - x - interp1d(fpr, tpr)(x), 0., 1.)
+    eer_value_str = "{:.4f}".format(eer_value)
+
+    auc_value = auc(labels, scores)
+    auc_value_str = "{:.4f}".format(auc_value)
+
     if figure==1:
         plt.figure()
+        plt.subplot(121)
         plt.plot(fpr,tpr)
-        plt.title('ROC Curve: '+os.path.basename(pathfigure[:-4])+'EER='+str(eer_value))
+        plt.title('ROC Curve '+'EER='+eer_value_str+' AUC= '+auc_value_str)
         plt.ylabel('TPR')
         plt.xlabel('FPR')
         plt.grid(True)
+
+        # Histograma
+        scores = np.array(scores)
+        labels = np.array(labels)
+
+        tar = scores[labels==1]
+        non = scores[labels==0]
+
+        min_edge = min(np.percentile(non, 10), np.percentile(tar, 10))
+        max_edge = max(np.percentile(non, 90), np.percentile(tar, 90))
+        x = np.linspace(min_edge, max_edge, 100)
+
+        n_tar, _ = np.histogram(tar, x)
+        n_non, _ = np.histogram(non, x)
+
+        plt.subplot(122)
+        plt.plot(x[:-1], n_non/max(n_non), color='green')
+        plt.plot(x[:-1], n_tar/max(n_tar), color='red', linestyle='--')
+        plt.legend(('PATH','HEALTH'))
+        plt.grid(True)
+
         plt.savefig(pathfigure)
+        plt.close()
+        
     return eer_value
 
 def compute_plots(path_file):
@@ -93,6 +126,33 @@ def compute_plots(path_file):
     pathfigure=os.path.dirname(path_file)+'/results_by_epoch.png'
     plt.savefig(pathfigure)
 
+    # Plot only Dev
+    plt.figure()
+    plt.subplot(2,2,1)
+    plt.plot(epoch,dev_acc,'b')
+    plt.title('ACC')
+    plt.legend(('dev'))
+    plt.grid(True)
+    plt.subplot(2,2,2)
+    plt.plot(epoch,dev_uar,'b')
+    plt.title('UAR')
+    plt.legend(('dev'))
+    plt.grid(True)
+    plt.subplot(2,2,3)
+    plt.plot(epoch,dev_auc,'b')
+    plt.title('AUC')
+    plt.legend(('dev'))
+    plt.grid(True)
+    plt.subplot(2,2,4)
+    plt.plot(epoch,dev_eer,'b')
+    plt.title('EER')
+    plt.legend(('dev'))
+    plt.grid(True)
+    manager = plt.get_current_fig_manager() #fullscreen
+    manager.full_screen_toggle()
+    pathfigure=os.path.dirname(path_file)+'/results_by_epoch_dev.png'
+    plt.savefig(pathfigure)
+
 def compute_plots_loss(path_file):
     with open(path_file,'r') as fid:
         lines=fid.readlines()
@@ -103,129 +163,31 @@ def compute_plots_loss(path_file):
         if a[0] == 'dev': 
             epoch.append(int(a[3][:-1]))
             dev_loss.append(float(a[4][5:].split('\n')[0]))
+            plt.figure()
+            plt.plot(epoch,dev_loss,'b')
+            plt.legend(('dev'))
+            plt.title('Loss')
+            plt.grid(True)
+            
+            manager = plt.get_current_fig_manager() #fullscreen
+            manager.full_screen_toggle()
+            pathfigure=os.path.dirname(path_file)+'/loss_by_epoch_dev.png'
+            plt.savefig(pathfigure)
+
         elif a[0] == 'test': 
             test_loss.append(float(a[4][5:].split('\n')[0]))
-    
             e = len(epoch)
             plt.figure()
             plt.plot(epoch,dev_loss,'b')
-            #plt.plot(epoch[0:len(test_loss)],test_loss,'r')
             plt.plot(epoch,test_loss[0:e],'r')
-            plt.title('Loss')
             plt.legend(('dev','test'))
+            plt.title('Loss')
             plt.grid(True)
             
             manager = plt.get_current_fig_manager() #fullscreen
             manager.full_screen_toggle()
             pathfigure=os.path.dirname(path_file)+'/loss_by_epoch.png'
             plt.savefig(pathfigure)
-
-
-# Data augmentation
-def mixup_data(x, y, alpha=0.1, beta=0.1, use_cuda=False):
-    '''Returns mixed inputs, pairs of target and lambda '''
-    if alpha > 0:
-        lam = np.random.beta(alpha,beta)
-    else:
-        lam = 1
-
-    batch_size = x.size()[0]
-    index = torch.randperm(batch_size)
-    mixed_x = lam * x + (1 - lam) * x[index,:,:]
-    index = index.tolist()
-    y = np.asarray(y)
-    y_b = y[index]
-    
-    return mixed_x, y, y_b, lam
-
-def mixup_data_samelabel(x, y, alpha=0.1, beta=0.1, use_cuda=False):
-    '''Returns mixed inputs pairs of target and lambda. 
-    But mixing feature vectors with the same label (for the binary label case), 
-    such that features with label 1 are only mixed with features with label 1, and so on.'''
-    if alpha > 0:
-        lam = np.random.beta(alpha,beta)
-    else:
-        lam = 1
-
-    y = np.asarray(y)
-
-    x0 = x[y==0]
-    y0 = y[y==0]
-    batch_size = x0.size()[0]    
-    index0 = torch.randperm(batch_size)
-    mixed_x0 = lam * x0 + (1 - lam) * x0[index0,:,:]
-    
-    x1 = x[y==1]
-    y1 = y[y==1]
-    batch_size = x1.size()[0]    
-    index1 = torch.randperm(batch_size)
-    mixed_x1 = lam * x1 + (1 - lam) * x1[index1,:,:]
-        
-    '''
-    print('Shape x:')
-    print(x.shape)
-    print('Shape x0:')
-    print(x0.shape)
-    print('Shape y:')
-    print(y.shape)
-    print('Shape y0:')
-    print(y0.shape)
-    print('Shape y1:')
-    print(y1.shape)
-    print('Lam:')
-    print(lam)
-    '''
-
-    mixed_x = torch.cat((mixed_x0,mixed_x1))
-    y_b = np.concatenate((y0[index0.tolist()],y1[index1.tolist()]))
-    index = torch.randperm(mixed_x.size()[0])
-    mixed_out = mixed_x[index,:,:]
-    y_out = y_b[index.tolist()]
-    
-    print('Shape mixed_x:')
-    print(mixed_x.shape)
-    print('y:')
-    print(y)
-    print('y_b:')
-    print(y_b)
-    print('y_out:')
-    print(y_out)
-    
-    return mixed_out, y, y_out, lam
-
-def batch_distortion_augment(x, y, n, alpha=0.1, beta=0.1): 
-    x_temp = torch.clone(x)
-    y_temp = y
-    for _ in range(n):
-        mixed_x, y_a, y_b, lam = mixup_data(x, y, alpha, beta)
-        x_temp = torch.cat((x_temp, mixed_x))
-        y_temp = np.concatenate((y_temp, y_b))    
-    '''
-    print('Shape batch size:')
-    print(x.shape)  
-    print('Shape new batch size:')
-    print(x_temp.shape)  
-    '''
-    return x_temp, y_temp
-
-def batch_distortion_augment_samelabel(x, y, n, alpha=0.1, beta=0.1): 
-    x_temp = torch.clone(x)
-    y_temp = y
-    for _ in range(n):
-        mixed_x, y_a, y_b, lam = mixup_data_samelabel(x, y, alpha, beta)
-        x_temp = torch.cat((x_temp, mixed_x))  #Concat the original with the new mixed versions
-        y_temp = np.concatenate((y_temp, y_b))  
-
-    print('Shape batch size:')
-    print(x.shape)  
-    print('Shape new batch size:')
-    print(x_temp.shape)    
-
-    return x_temp, y_temp
-
-def mixup_criterion(criterion, predicted, y_a, y_b, lam):
-    return lam * criterion(predicted, y_a) + (1-lam) * criterion(predicted, y_b)
-
 
 
 
@@ -238,8 +200,14 @@ class DownstreamExpert(nn.Module):
         self.modelrc = downstream_expert['modelrc']
         self.listrc = downstream_expert['listrc']
         self.visualrc = downstream_expert['visualrc']
+        try: 
+            a = downstream_expert['lossrc']
+            self.lossrc = a
+        except: 
+            self.lossrc = {}
+            self.lossrc['loss_type'] = 'CrossEntropyLoss'
         print('[Expert] - Model: '+self.modelrc['select'])
-        print('[Expert] - Loss: CrossEntropyLoss') #print('[Expert] - Loss: '+self.modelrc['Loss']['loss_type'])
+        print('[Expert] - Loss: '+self.lossrc['loss_type'])
         
         DATA_ROOT = self.datarc['root']
         self.fold = self.datarc.get('test_fold') or kwargs.get("downstream_variant")
@@ -249,31 +217,10 @@ class DownstreamExpert(nn.Module):
         print(f"[Expert] - using the testing fold: \"{self.fold}\". Ps. Use -o config.downstream_expert.datarc.test_fold=fold2 to change test_fold in config.")
 
         # Create train/test list (json) path
-        '''
-        augment_list=self.listrc['augment_list']
-        if augment_list=='NONE':
-            train_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+ self.fold +'.json')
-        else:
-            train_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_augment_meta_data_'+augment_list+'_'+self.fold +'.json')
-        print(f'[Expert] - Training path: {train_path}')
-        
-        if self.listrc['oracle']==1:
-            test_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+ self.fold +'.json')
-        else:
-            test_path = os.path.join(DATA_ROOT, 'data/lst', 'test_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+ self.fold +'.json')
-        print(f'[Expert] - Testing path: {test_path}')
-        
-        train_path = os.path.join(DATA_ROOT, 'data/lst', 'train_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+self.listrc['traindata']+'_'+self.fold +'.json')
-        print(f'[Expert] - Training path: {train_path}')
-        test_path = os.path.join(DATA_ROOT, 'data/lst', 'test_'+self.listrc['audiotype']+'_'+self.listrc['gender']+'_meta_data_'+self.listrc['testdata']+'_'+self.fold +'.json')
-        print(f'[Expert] - Testing path: {test_path}')
-        '''
-
         train_path = os.path.join(DATA_ROOT, 'data/lst', self.listrc['traindata']+'_'+self.fold +'.json')
         print(f'[Expert] - Training path: {train_path}')
         test_path = os.path.join(DATA_ROOT, 'data/lst', self.listrc['testdata']+'_'+self.fold +'.json')
         print(f'[Expert] - Testing path: {test_path}')
-        
 
         # Loading train/test dataset 
         dataset = SaarbrueckenDataset(DATA_ROOT, train_path, self.datarc['pre_load'])
@@ -296,8 +243,33 @@ class DownstreamExpert(nn.Module):
         )
         # Set loss function
         self.objective = nn.CrossEntropyLoss()
+
+        # Modified: Set loss function
+        losstype = self.lossrc['loss_type']
+        if losstype=='CrossEntropyLoss':
+            self.objective = nn.CrossEntropyLoss()
+        elif losstype=='LabelSmoothingCrossEntropyLoss':
+            epsilon=self.lossrc['epsilon']
+            self.objective = LabelSmoothingCrossEntropy(epsilon=epsilon, reduction='sum')
+        elif losstype=='LogitNormLoss':
+            self.objective = LogitNormLoss(device='gpu', t=1.0) 
+        elif losstype=='AUCLoss':
+            delta = self.lossrc['delta_aucloss']
+            self.objective = AUCLoss(delta=delta) 
+        elif losstype=='BrierLoss':
+            self.objective = BrierLoss()
+        elif losstype=='MSELoss':
+            self.objective = nn.MSELoss()
+        elif losstype=='ECELoss':
+            self.objective = ECELoss()
+        else:
+            self.objective = nn.CrossEntropyLoss()
+        #------------------------------------------
+        
         self.expdir = expdir
         self.register_buffer('best_score', torch.zeros(1))
+
+        
 
     def get_downstream_name(self):
         return self.fold.replace('fold', 'pathology')
@@ -334,6 +306,7 @@ class DownstreamExpert(nn.Module):
     # Interface
     def forward(self, mode, features, labels, filenames, records, **kwargs):
         device = features[0].device
+        print(device)
         features_len = torch.IntTensor([len(feat) for feat in features]).to(device=device)
 
         features = pad_sequence(features, batch_first=True)
@@ -388,10 +361,10 @@ class DownstreamExpert(nn.Module):
             else:
                 predicted, features_pooled = self.model(features, features_len) # Meaning: predicted=logit, features_pooled=embedding
                 labels = torch.LongTensor(labels).to(features.device)
-                loss = self.objective(predicted, labels)
+                loss = self.objective(predicted, labels) #Apply loss function
 
 
-        predicted_classid = predicted.max(dim=-1).indices
+        predicted_classid = predicted.max(dim=-1).indices  # Assumption: Threshold 0.5
         records['acc'] += (predicted_classid == labels).view(-1).cpu().float().tolist()
         records['loss'].append(loss.item())
 
@@ -413,7 +386,9 @@ class DownstreamExpert(nn.Module):
         best = 0
         if average > self.best_score: best=1
         
-        if best==1 and features_pooled!=None and self.visualrc['embeddings']==1:
+        #if best==1 and features_pooled!=None and self.visualrc['embeddings']==1:
+        if features_pooled!=None and self.visualrc['embeddings']==1:
+            print('Saving embeddings mode: ' + mode)
             emb_path = self.expdir + '/embeddings/' + mode
             if not os.path.exists(emb_path): os.makedirs(emb_path)
 
@@ -475,6 +450,7 @@ class DownstreamExpert(nn.Module):
             fig_path = self.expdir + '/figures'
             if not os.path.exists(fig_path): os.mkdir(fig_path)
             eer_value = eer(lab, records["score_1"], figure=1, pathfigure=fig_path+'/ROC_step_'+str(global_step)+'.png')
+            #eer_value = eer(lab, records["score_1"], figure=1, pathfigure=fig_path+'/ROC.png')
         else:
             eer_value = eer(lab, records["score_1"])
         #--------------------------------------

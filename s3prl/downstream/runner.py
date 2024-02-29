@@ -29,6 +29,7 @@ from s3prl.upstream.interfaces import Featurizer
 from s3prl.utility.helper import is_leader_process, get_model_state, show, defaultdict
 
 from huggingface_hub import HfApi, HfFolder, Repository
+import time 
 
 SAMPLE_RATE = 16000
 
@@ -210,6 +211,10 @@ class Runner():
         scheduler = None
         if self.config.get('scheduler'):
             scheduler = self._get_scheduler(optimizer)
+            lr = scheduler.get_lr()
+            with open(self.args.expdir + "\log_lr.log", 'w') as f:
+                f.write(str(lr[0]) + '\n')
+            f.close()
 
         # specaug
         specaug = None
@@ -243,14 +248,21 @@ class Runner():
                         dataloader.sampler.set_epoch(epoch)
                 else:
                     raise
-
+            # Added by dayi: Frozen the first 192 layers of upstream
+            #for i, (name, param) in enumerate(self.upstream.model.named_parameters()):
+            #    if i < 192:
+            #        param.requires_grad = False
+            #    #print(i, name, param.shape, param.requires_grad)
+            
             for batch_id, (wavs, *others) in enumerate(tqdm(dataloader, dynamic_ncols=True, desc='train', file=tqdm_file)):
+                
+                t = time.time()
+                
                 # try/except block for forward/backward
                 try:
                     if pbar.n >= pbar.total:
                         break
                     global_step = pbar.n + 1
-
                     wavs = [torch.FloatTensor(wav).to(self.args.device) for wav in wavs]  
                     #print('wavs: ',type(wavs),len(wavs),wavs[0].shape)
                     #print(type(others[0]))
@@ -331,7 +343,11 @@ class Runner():
                 # adjust learning rate
                 if scheduler:
                     scheduler.step()
-
+                    lr = scheduler.get_lr()
+                    with open(self.args.expdir + "/log_lr.log", 'a') as f:
+                        f.write(str(lr[0]) + '\n')
+                    f.close()
+                    
                 if not is_leader_process():
                     batch_ids = []
                     records = defaultdict(list)
@@ -395,6 +411,8 @@ class Runner():
 
                 pbar.update(1)
             epoch += 1
+            elapsed = time.time() - t
+            print('TIME '+ str(elapsed) + ' epoch: ' + str(epoch))
 
         pbar.close()
 

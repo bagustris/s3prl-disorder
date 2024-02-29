@@ -10,15 +10,19 @@ condor.cfg
 launch.json
 expert_extendido.py
 expert_mixup.py
+env_s3prl
+env_s3prl_python3.9
 log
 data/audio
+data/lst/listas_duda
 s3prl/downstream/voicedisorder/data/audio
 s3prl/downstream/voicedisorder/expert_extendido.py
 s3prl/downstream/voicedisorder/expert_mixup.py
 s3prl/result
-#s3prl/run_voicedisorder_finetune.sh
+s3prl/run_voicedisorder_finetune_ckpt.sh
 #s3prl/run_voicedisorder_basic.sh
 s3prl/condor_run_voicedisorder.sh
+test_CE.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
